@@ -43,13 +43,13 @@ async def get_expire_info(expire_value: int, expire_style: str):
     :return: expired_at 过期时间, expired_count 可用次数, used_count 已用次数, code 随机码
     """
     expired_count, used_count, now, code = -1, 0, datetime.datetime.now(), None
-    if settings.max_save_seconds > 0:
+    if int(settings.max_save_seconds) > 0:
         max_timedelta = datetime.timedelta(seconds=settings.max_save_seconds)
         detail = await max_save_times_desc(settings.max_save_seconds)
-        detail = f'保存时间超过限制，{detail[0]}'
+        detail = f'限制最长时间为 {detail[0]}，可换用其他方式'
     else:
         max_timedelta = datetime.timedelta(days=7)
-        detail = '保存时间超过限制，最长保存时间：7天'
+        detail = '限制最长时间为 7天，可换用其他方式'
     if expire_style == 'day':
         if datetime.timedelta(days=expire_value) > max_timedelta:
             raise HTTPException(status_code=403, detail=detail)
@@ -86,7 +86,7 @@ async def get_random_code(style='num'):
             return code
 
 
-# 错误IP限制器
-error_ip_limit = IPRateLimit(count=settings.errorCount, minutes=settings.errorMinute)
-# 上传文件限制器
-upload_ip_limit = IPRateLimit(count=settings.uploadCount, minutes=settings.errorMinute)
+ip_limit = {
+    'error': IPRateLimit(count=settings.uploadCount, minutes=settings.errorMinute),
+    'upload': IPRateLimit(count=settings.errorCount, minutes=settings.errorMinute)
+}

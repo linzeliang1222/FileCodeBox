@@ -61,17 +61,19 @@ export default {
       admin_token: '管理密码',
       uploadSize: '文件大小',
       expireStyle: '过期方式',
+      showAdminAddr: '显示后台',
+      showAdmin:{
+        open: '开启',
+        close: '关闭',
+        note: '是否在页面底部显示后台入口',
+      },
+      robotsText: 'robots.txt',
       uploadSizeNote: '最大文件大小，单位:（Bytes),1mb=1 * 1024 * 1024',
       openUpload: {
         title: '开启上传',
         open: '开启游客上传',
         close: '关闭游客上传',
         note: '关闭之后需要登录后台方可上传',
-      },
-      showAdmin:{
-        open: '开启',
-        close: '关闭',
-        note: '是否在页面底部显示后台入口',
       },
       file_storage: {
         title: '存储引擎',

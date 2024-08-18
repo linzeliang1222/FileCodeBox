@@ -9,26 +9,67 @@
     <el-form-item size="large" :label="t('admin.settings.keywords')" style="letter-spacing: 0.3rem">
       <el-input v-model="config.keywords" />
     </el-form-item>
+    <el-form-item size="large" :label="t('admin.settings.notify_title')">
+      <el-input v-model="config.notify_title" />
+    </el-form-item>
+    <el-form-item size="large" :label="t('admin.settings.notify_content')">
+      <el-input v-model="config.notify_content" />
+    </el-form-item>
     <el-form-item size="large" :label="t('admin.settings.background')">
-      <el-input v-model="config.background" />
+      <span style="display: flex;height: 38px;width: 45%">
+          <el-input v-model="config.background" placeholder="url" />
+      </span>
+      <span style="display: flex;height: 38px;margin-left: 20px">
+         Opacity: <el-input type="number" v-model="config.opacity" />
+      </span>
+    </el-form-item>
+    <el-form-item size="large" :label="t('admin.settings.showAdminAddr')">
+      <el-select v-model="config.showAdminAddr" style="width: 80%">
+        <el-option :label="t('admin.settings.showAdmin.open')" :value="1" />
+        <el-option :label="t('admin.settings.showAdmin.close')" :value="0" />
+      </el-select>
+      <small style="margin-left: 0.4rem">{{ t('admin.settings.showAdmin.note') }}</small>
+    </el-form-item>
+    <el-form-item size="large" label="robots.Text">
+      <el-input type="textarea" v-model="config.robotsText" placeholder="explain" />
+    </el-form-item>
+    <el-form-item size="large" :label="t('admin.settings.explain')">
+      <el-input type="textarea" v-model="config.page_explain" placeholder="explain" />
     </el-form-item>
     <el-form-item size="large" :label="t('admin.settings.admin_token')">
       <el-input type="password" v-model="config.admin_token" />
     </el-form-item>
     <el-form-item size="large" :label="t('admin.settings.uploadSize')">
       <el-input type="number" v-model="config.uploadSize" />
-      <template #append>Bytes</template>
-      <small>{{ t('admin.settings.uploadSizeNote') }}</small>
+      <template #append></template>
+      <small>Bytes：{{ t('admin.settings.uploadSizeNote') }}</small>
+    </el-form-item>
+    <el-form-item size="large" :label="t('admin.settings.max_save_seconds')">
+      <el-input type="number" v-model="config.max_save_seconds" />
+      <small>Seconds:{{t('admin.settings.maxSaveSecondsNote')}}</small>
+    </el-form-item>
+    <el-form-item size="large" :label="t('admin.settings.expireStyle')" >
+      <el-select
+          v-model="config.expireStyle"
+          multiple
+          style="width: 100%"
+      >
+        <el-option :label="t('send.expireData.day')" value="day" />
+        <el-option :label="t('send.expireData.hour')" value="hour" />
+        <el-option :label="t('send.expireData.minute')" value="minute" />
+        <el-option :label="t('send.expireData.forever')" value="forever" />
+        <el-option :label="t('send.expireData.count')" value="count" />
+      </el-select>
     </el-form-item>
     <el-form-item size="large" :label="t('admin.settings.openUpload.title')">
-      <el-select v-model="config.openUpload">
+      <el-select v-model="config.openUpload" style="width: 80%">
         <el-option :label="t('admin.settings.openUpload.open')" :value="1" />
         <el-option :label="t('admin.settings.openUpload.close')" :value="0" />
       </el-select>
       <small style="margin-left: 0.4rem">{{ t('admin.settings.openUpload.note') }}</small>
     </el-form-item>
     <el-form-item size="large" :label="t('admin.settings.file_storage.title')">
-      <el-select v-model="config.file_storage">
+      <el-select v-model="config.file_storage" style="width: 80%">
         <el-option :label="t('admin.settings.file_storage.local')" value="local" />
         <el-option :label="t('admin.settings.file_storage.s3')" value="s3" />
       </el-select>
@@ -102,13 +143,21 @@ const config = ref({
   name: '',
   description: '',
   file_storage: '',
+  expireStyle: [],
   admin_token: '',
+  robotsText:'',
   keywords: '',
+  notify_title: '',
+  notify_content: '',
   openUpload: 1,
   uploadSize: 1,
   uploadMinute: 1,
+  max_save_seconds: 0,
+  opacity: 0.9,
   s3_access_key_id: '',
   background: '',
+  showAdminAddr: 0,
+  page_explain: '',
   s3_secret_access_key: '',
   aws_session_token: '',
   s3_signature_version: '',
@@ -153,7 +202,7 @@ const submitSave = () => {
   font-size: 1rem;
   letter-spacing: 0.4rem;
 }
-small{
+small,.el-form-item__content{
   color: #909399;
   margin-left: 0.4rem;
 }

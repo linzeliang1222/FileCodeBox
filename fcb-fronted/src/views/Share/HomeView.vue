@@ -17,13 +17,13 @@ const input_status = reactive({
   'readonly': false,
   'loading': false,
 })
-
 import { useI18n } from 'vue-i18n'
+import { useConfigStore } from "@/stores/config";
+
+const { config } = useConfigStore()
 const noDialog = ()=>{
-  ElMessageBox.alert(t('send.alert'), t('send.mzsm'), {
-    confirmButtonText: '确定',
-    callback: () => {
-    }
+  ElMessageBox.alert(config.explain, t('send.disclaimers'), {
+    confirmButtonText: t('fileBox.ok'),
   });
 }
 const { t } = useI18n()
@@ -67,7 +67,7 @@ const listenInput = (num: number) => {
     code.value += num
   }
 };
-const name = atob('RmlsZUNvZGVCb3ggVjIuMCBCZXRh');
+const name = atob('RmlsZUNvZGVCb3ggVjIuMQ==');
 const url = atob('aHR0cHM6Ly9naXRodWIuY29tL3Zhc3RzYS9GaWxlQ29kZUJveA==');
 </script>
 
@@ -97,9 +97,10 @@ const url = atob('aHR0cHM6Ly9naXRodWIuY29tL3Zhc3RzYS9GaWxlQ29kZUJveA==');
       </el-card>
       <div style="text-align: center; margin-top: 1rem;color: #606266">
         <a style="text-decoration: none;color: #606266" target="_blank" :href="url">
-          {{ name}}
+          {{ name }}
         </a>
-        <a @click="noDialog" style="text-decoration: none;color: #606266;margin-left: 1rem" href="javascript:void(0)">{{t('send.mzsm')}}</a>
+        <a @click="noDialog" style="text-decoration: none;color: #606266;margin-left: 1rem" href="javascript:void(0)">{{t('send.disclaimers')}}</a>
+        <a v-if="config.show_admin_address" style="color: #606266;margin-left: 1rem;text-decoration: none" href="#/admin">Admin</a>
       </div>
     </main>
 </template>

@@ -8,10 +8,10 @@ from fastapi import APIRouter, Depends
 
 from apps.admin.depends import admin_required
 from apps.admin.pydantics import IDData
-from apps.base.models import FileCodes
+from apps.base.models import FileCodes, KeyValue
 from core.response import APIResponse
 from core.settings import settings
-from core.storage import file_storage
+from core.storage import FileStorageInterface, storages
 
 admin_api = APIRouter(
     prefix='/admin',
@@ -26,6 +26,7 @@ async def login():
 
 @admin_api.delete('/file/delete', dependencies=[Depends(admin_required)])
 async def file_delete(data: IDData):
+    file_storage: FileStorageInterface = storages[settings.file_storage]()
     file_code = await FileCodes.get(id=data.id)
     await file_storage.delete_file(file_code)
     await file_code.delete()
@@ -44,15 +45,24 @@ async def file_list(page: float = 1, size: int = 10):
 
 @admin_api.get('/config/get', dependencies=[Depends(admin_required)])
 async def get_config():
-    return APIResponse(detail=settings.__dict__)
+    return APIResponse(detail=settings.items())
 
 
 @admin_api.patch('/config/update', dependencies=[Depends(admin_required)])
 async def update_config(data: dict):
     admin_token = data.get('admin_token')
+    for key, value in data.items():
+        if key not in settings.default_config:
+            continue
+        if key in ['errorCount', 'errorMinute', 'max_save_seconds', 'onedrive_proxy', 'openUpload', 'port', 's3_proxy', 'uploadCount', 'uploadMinute', 'uploadSize']:
+            data[key] = int(value)
+        elif key in ['opacity']:
+            data[key] = float(value)
+        else:
+            data[key] = value
     if admin_token is None or admin_token == '':
         return APIResponse(code=400, detail='管理员密码不能为空')
-
+    await KeyValue.filter(key='settings').update(value=data)
     for k, v in data.items():
         settings.__setattr__(k, v)
     return APIResponse()
@@ -70,6 +80,7 @@ async def get_file_by_id(id):
 
 @admin_api.get('/file/download', dependencies=[Depends(admin_required)])
 async def file_download(id: int):
+    file_storage: FileStorageInterface = storages[settings.file_storage]()
     has, file_code = await get_file_by_id(id)
     # 检查文件是否存在
     if not has:

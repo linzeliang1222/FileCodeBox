@@ -7,8 +7,10 @@ import { useFileBoxStore } from "@/stores/fileBox";
 import { ElMessage } from "element-plus";
 
 import { useI18n } from 'vue-i18n'
+import { useConfigStore } from "@/stores/config";
 
 const { t } = useI18n()
+const {config} = useConfigStore();
 const fileBoxStore = useFileBoxStore();
 const fileStore = useFileDataStore();
 const props = defineProps({
@@ -25,6 +27,8 @@ const props = defineProps({
 const handleSubmitShareText = ()=>{
   if (shareText.value === '') {
     ElMessage.warning(t('send.prompt3'));
+  } else if(config.openUpload === 0 && localStorage.getItem('adminPassword') === null){
+    ElMessage.error(t('msg.uploadClose'));
   } else {
     const formData = new FormData();
     formData.append('text', shareText.value);
@@ -62,7 +66,7 @@ const handleSubmitShareText = ()=>{
       :input-style="{'border-radius':'20px','border':'1px dashed var(--el-border-color)','box-shadow':'none'}"
   >
   </el-input>
-  <el-button @click="handleSubmitShareText" style="position: absolute;right: 0;top: 0;border-radius: 0 20px 0 20px;margin: 1px;background: rgba(255,255,255,0.2)" size="large">{{t('send.share')}}</el-button>
+  <el-button @click="handleSubmitShareText" style="position: absolute;right: 0;bottom: 0;border-radius: 20px 0 20px 0;margin: 1px;background: rgba(255,255,255,0.2)" size="large">{{t('send.share')}}</el-button>
 </div>
 </template>
 
